@@ -122,6 +122,7 @@ class AdminController extends Controller
                     "flourida" => $request->flourida,
                     "khlorin" => $request->khlorin,
                     "nitrit" => $request->nitrit,
+                    "kromium6" => $request->kromium6,
                     "belerang" => $request->belerang,
                     "klorida" => $request->klorida,
                     "minyak" => $request->minyak,
@@ -133,7 +134,8 @@ class AdminController extends Controller
                     "total_koliform" => $request->total_koliform,
                     "fecal_kolifom" => $request->fecal_kolifom,
                     "ika"=>$ika,
-                    "ipj"=>$ipj
+                    "ipj"=>$ipj,
+                    "status"=>$this->status($ika)
                 ]
             );
             return response([
@@ -156,53 +158,95 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         try {
-            $quality = KualitasAir::find($request->id);
+            $kualitas = KualitasAir::find($request->id);
             // Getting values from the blade template form
             $ika = $this->indexKualitas($request);
             $ipj = $this->indexPolusi($request);
-            $status = $this->status($ika);
 
-            $quality->update(
-                [
-                    "titik_pantau_id" => $request->titik_pantau_id,
-                    "user_id" => $request->user()->id,
-                    "ika" => $ika,
-                    "ipj" => $ipj,
-                    "status" => $status,
-                    "suhu" => $request->suhu,
-                    "ph" => $request->ph,
-                    "dhl" => $request->dhl,
-                    "tds" => $request->tds,
-                    "tss" => $request->tss,
-                    "do" => $request->do,
-                    "bod" => $request->bod,
-                    "cod" => $request->cod,
-                    "no_2" => $request->no_2,
-                    "no_3" => $request->no_3,
-                    "nh_2" => $request->nh_2,
-                    "clorin" => $request->clorin,
-                    "total_fosfat" => $request->total_fosfat,
-                    "fenol" => $request->fenol,
-                    "oil" => $request->oil,
-                    "detergent" => $request->detergent,
-                    "fecal_coliform" => $request->fecal_coliform,
-                    "total_coliform" => $request->total_coliform,
-                    "cyanide" => $request->cyanide,
-                    "h2s" => $request->h2s,
-                ]
-            );
+            $ika = $this->indexKualitas($request);
+            $ipj = $this->indexPolusi($request);
+
+            $waktu = DateTime::createFromFormat('d-m-Y', $request->waktu);
+
+            $waktuSampling = WaktuSampling::where('tahun', '=', $waktu->format('Y'))
+                ->where('tahap', '=', $request->tahap)
+                ->first();
+
+            if ($waktuSampling == null) {
+                $waktuSampling = WaktuSampling::create([
+                    "waktu" => $waktu,
+                    "tahun" => $waktu->format("Y"),
+                    "tahap" => $request->tahap
+                ]);
+            }
+            if ($kualitas) {
+                $kualitas->update(
+                    [
+                        "titik_pantau_id" => $request->titik_pantau_id,
+                        "user_id" => $request->user()->id,
+                        "waktu_sampling_id" => $waktuSampling->id,
+                        "suhu" => $request->suhu,
+                        "tds" => $request->tds,
+                        "warna" => $request->warna,
+                        "tss" => $request->tss,
+                        "ph" => $request->ph,
+                        "bod" => $request->bod,
+                        "cod" => $request->cod,
+                        "do" => $request->do,
+                        "kromium6" => $request->kromium6,
+                        "phospat" => $request->phospat,
+                        "nitrat" => $request->nitrat,
+                        "amonia" => $request->amonia,
+                        "arsen" => $request->arsen,
+                        "kobalt" => $request->kobalt,
+                        "boron" => $request->boron,
+                        "selenium" => $request->selenium,
+                        "kadium" => $request->kadium,
+                        "tembaga" => $request->tembaga,
+                        "timbal" => $request->timbal,
+                        "merkuri" => $request->merkuri,
+                        "seng" => $request->seng,
+                        "sianida" => $request->sianida,
+                        "flourida" => $request->flourida,
+                        "khlorin" => $request->khlorin,
+                        "nitrit" => $request->nitrit,
+                        "belerang" => $request->belerang,
+                        "klorida" => $request->klorida,
+                        "minyak" => $request->minyak,
+                        "sulfat" => $request->sulfat,
+                        "phenol" => $request->phenol,
+                        "deterjen" => $request->deterjen,
+                        "n_total" => $request->n_total,
+                        "nikel" => $request->nikel,
+                        "total_koliform" => $request->total_koliform,
+                        "fecal_kolifom" => $request->fecal_kolifom,
+                        "ika"=>$ika,
+                        "ipj"=>$ipj,
+                        "status"=>$this->status($ika)
+                    ]
+                );
+            }else{
+                return response(
+                    [
+                        "message" => "Kualitas tidak ditemukan",
+                        "status" => false,
+                        "data" => null
+                    ],
+                    200
+                );
+            }
             return response(
                 [
                     "message" => "Update Success",
                     "status" => true,
-                    "data" => null
+                    "data" => KualitasAir::find($request->id)
                 ],
-                401
+                200
             );
         } catch (\Throwable $th) {
             return response(
                 [
-                    "message" => "Update Error",
+                    "message" => $th->__toString(),
                     "status" => false,
                     "data" => null
                 ],

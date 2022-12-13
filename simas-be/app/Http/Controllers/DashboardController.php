@@ -69,4 +69,22 @@ class DashboardController extends Controller
             "data"=>$titikPantau
         ]);
     }
+
+    public function kualitas(){
+        $result= [];
+        $index = 0;
+        $waktusampling = WaktuSampling::orderBy('waktu', 'DESC')->get();
+
+        foreach ($waktusampling as $item) {
+            $result[$index] = $item;
+            $result[$index]['kualitas'] = $item->kualitas;
+            $index++;
+        }
+
+        return response([
+            "message" => "Success",
+            "status"=>true,
+            "data"=>$result
+        ]);
+    }
 }

@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+Route::get('/kualitas',[DashboardController::class, 'kualitas']);
+
 Route::prefix('/beranda')->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('/upper', [DashboardController::class, 'upper']);
