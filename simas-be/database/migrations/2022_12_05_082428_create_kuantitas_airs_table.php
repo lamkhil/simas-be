@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('kuantitas_airs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('titik_pantau_id');
-            $table->float('ketinggian');
-            $table->float('kecepatan');
+            $table->double('ketinggian');
+            $table->double('kecepatan');
             $table->timestamps();
         });
     }

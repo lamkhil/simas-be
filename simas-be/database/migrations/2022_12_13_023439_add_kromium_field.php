@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('kualitas_airs', function (Blueprint $table) {
-           $table->float('kromium6')->nullable();
+           $table->double('kromium6')->nullable();
         });
     }
 
