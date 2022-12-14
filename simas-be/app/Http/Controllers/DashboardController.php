@@ -19,9 +19,31 @@ class DashboardController extends Controller
     public function index()
     {
         $time = WaktuSampling::orderBy('waktu', 'DESC')->get();
+        if ($time->count()==0) {
+            return response(
+                [
+                    "message" => "Success",
+                    "status" => true,
+                    "data" => [
+                        "ika"=>0,
+                        "ika_compare"=>null,
+                        "ketinggan_air"=>0,
+                        "ketinggian_compare"=>null,
+                        "ika_terendah"=>[
+                            "ika" => 0,
+                            "ika_compare"=>0,
+                            "titik_pantau"=>null
+                        ],
+                        "tingkat_kecemaran"=>null,
+                        "grafik_ika"=>[],
+                        "grafik_parameter"=>[],
+                    ]
+                ]
+            );
+        }
         $ketinggian = KuantitasAir::where('waktu_sampling_id',$time[0]['id'])->avg('ketinggian')??0;
         $ketinggian_before = 0;
-        if ($time->count()>0) {
+        if ($time->count()>1) {
             $ketinggian_before =  KuantitasAir::where('waktu_sampling_id',$time[1]['id'])->avg('ketinggian');
         }
         $ketinggian_comparison = $ketinggian > $ketinggian_before ? 'Naik' : 'Turun';
