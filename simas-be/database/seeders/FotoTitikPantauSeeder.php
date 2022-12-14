@@ -113,10 +113,5 @@ class FotoTitikPantauSeeder extends Seeder
             'titik_pantau_id' => 20,
             'link' => '/image/sungai-brantas/sungai-punden-1.jpg'
         ]);
-
-        FotoTitikPantau::create([
-            'titik_pantau_id' => 21,
-            'link' => '/image/sungai-brantas/sungai-temas-1.jpg'
-        ]);
     }
 }
