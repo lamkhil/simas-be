@@ -39,6 +39,9 @@ Route::prefix('/beranda')->group(function () {
 Route::prefix('/titik-pantau')->group(function () {
     Route::get('/', [DashboardController::class, 'titikPantau']);
 });
+Route::prefix('/laporan')->group(function () {
+    Route::get('/', [DashboardController::class, 'laporan']);
+});
 
 Route::get('/', function (Request $request) {
     return response([

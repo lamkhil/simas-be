@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\KualitasAir;
+use App\Models\KuantitasAir;
 use App\Models\TitikPantau;
 use App\Models\WaktuSampling;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -17,6 +19,12 @@ class DashboardController extends Controller
     public function index()
     {
         $time = WaktuSampling::orderBy('waktu', 'DESC')->get();
+        $ketinggian = KuantitasAir::where('waktu_sampling_id',$time[0]['id'])->avg('ketinggian')??0;
+        $ketinggian_before = 0;
+        if ($time->count()>0) {
+            $ketinggian_before =  KuantitasAir::where('waktu_sampling_id',$time[1]['id'])->avg('ketinggian');
+        }
+        $ketinggian_comparison = $ketinggian > $ketinggian_before ? 'Naik' : 'Turun';
         $ika = KualitasAir::join('waktu_samplings', 'kualitas_airs.waktu_sampling_id', '=', 'waktu_samplings.id')
                 ->where('waktu_samplings.waktu', $time[0]['waktu'])
                 ->avg('ika');
@@ -39,6 +47,18 @@ class DashboardController extends Controller
         }
         $ika_terendah_comparison = $min_ika > $ika_terendah_before?'Naik':"Turun";
         $ika_terendah['ika_compare']=$ika_terendah_comparison;
+        $grafik_ika =[];
+        $waktu = WaktuSampling::orderBy('waktu', 'DESC')->take(10)->get();
+        foreach ($waktu as $item) {
+            $data = [
+                "ika" => KualitasAir::join('waktu_samplings', 'kualitas_airs.waktu_sampling_id', '=', 'waktu_samplings.id')
+                ->where('waktu_samplings.waktu', $item['waktu'])
+                ->avg('ika'),
+                "tahun"=>$item->tahun,
+                "tahap"=>$item->tahap
+            ];
+            array_push($grafik_ika, $data);
+        }
         return response(
             [
                 "message" => "Success",
@@ -46,10 +66,12 @@ class DashboardController extends Controller
                 "data" => [
                     "ika"=>$ika,
                     "ika_compare"=>$ika_comparison,
-                    "ketinggan_air"=>null,
+                    "ketinggan_air"=>$ketinggian,
+                    "ketinggian_compare"=>$ketinggian_comparison,
                     "ika_terendah"=>$ika_terendah,
-                    "ketinggian_compare"=>null,
-                    "tingkat_kecemaran"=>$this->status($ika)
+                    "tingkat_kecemaran"=>$this->status($ika),
+                    "grafik_ika"=>$grafik_ika,
+                    "grafik_parameter"=>WaktuSampling::with('kualitas')->orderBy('waktu','DESC')->take(10)->get(),
                 ]
             ]
         );
@@ -104,7 +126,7 @@ class DashboardController extends Controller
     }
 
     public function titikPantau(){
-        $titikPantau = TitikPantau::all();
+        $titikPantau = TitikPantau::with(['kualitas','kuantitas','foto'])->get();
 
         return response([
             "message" => "Success",
@@ -130,4 +152,11 @@ class DashboardController extends Controller
             "data"=>$result
         ]);
     }
+
+    public function laporan(){
+        $data = WaktuSampling::orderBy('waktu', 'DESC')->with('kualitas')->paginate(2);
+        return response()->json($data,200);
+    }
+
+
 }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('waktu_sampling_id');
             $table->float('suhu')->nullable();
             $table->float('tds')->nullable();
-            $table->string('warna')->nullable();
+            $table->float('warna')->nullable();
             $table->float('tss')->nullable();
             $table->float('ph')->nullable();
             $table->float('bod')->nullable();

@@ -20,6 +20,6 @@ class KualitasAir extends Model
     }
 
     public function waktu_sample(){
-        return $this->belongsTo(WaktuSampling::class);
+        return $this->belongsTo(WaktuSampling::class, 'waktu_sampling_id');
     }
 }

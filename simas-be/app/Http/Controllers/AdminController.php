@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KualitasAir;
+use App\Models\KuantitasAir;
 use App\Models\User;
 use App\Models\WaktuSampling;
 use DateTime;
@@ -93,10 +94,17 @@ class AdminController extends Controller
                     "tahap" => $request->tahap
                 ]);
             }
+           KuantitasAir::create([
+                "titik_pantau_id" => $request->titik_pantau_id,
+                "ketinggian" => rand(270,370),
+                "kecepatan" => rand(60,110),
+                "waktu_sampling_id" => $waktuSampling->id
+            ]);
             $kualitas = KualitasAir::create(
                 [
                     "titik_pantau_id" => $request->titik_pantau_id,
                     "user_id" => $request->user()->id,
+                    'waktu'=>$waktu,
                     "waktu_sampling_id" => $waktuSampling->id,
                     "suhu" => $request->suhu,
                     "tds" => $request->tds,
@@ -133,9 +141,9 @@ class AdminController extends Controller
                     "nikel" => $request->nikel,
                     "total_koliform" => $request->total_koliform,
                     "fecal_kolifom" => $request->fecal_kolifom,
-                    "ika"=>$ika,
-                    "ipj"=>$ipj,
-                    "status"=>$this->status($ika)
+                    "ika" => $ika,
+                    "ipj" => $ipj,
+                    "status" => $this->status($ika)
                 ]
             );
             return response([
@@ -171,7 +179,7 @@ class AdminController extends Controller
             $waktuSampling = WaktuSampling::where('tahun', '=', $waktu->format('Y'))
                 ->where('tahap', '=', $request->tahap)
                 ->first();
-
+                
             if ($waktuSampling == null) {
                 $waktuSampling = WaktuSampling::create([
                     "waktu" => $waktu,
@@ -193,6 +201,7 @@ class AdminController extends Controller
                         "bod" => $request->bod,
                         "cod" => $request->cod,
                         "do" => $request->do,
+                        'waktu'=>$waktu,
                         "kromium6" => $request->kromium6,
                         "phospat" => $request->phospat,
                         "nitrat" => $request->nitrat,
@@ -220,12 +229,12 @@ class AdminController extends Controller
                         "nikel" => $request->nikel,
                         "total_koliform" => $request->total_koliform,
                         "fecal_kolifom" => $request->fecal_kolifom,
-                        "ika"=>$ika,
-                        "ipj"=>$ipj,
-                        "status"=>$this->status($ika)
+                        "ika" => $ika,
+                        "ipj" => $ipj,
+                        "status" => $this->status($ika)
                     ]
                 );
-            }else{
+            } else {
                 return response(
                     [
                         "message" => "Kualitas tidak ditemukan",

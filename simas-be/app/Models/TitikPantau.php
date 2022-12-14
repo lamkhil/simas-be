@@ -12,7 +12,7 @@ class TitikPantau extends Model
     protected $guarded=[];
 
     public function kualitas(){
-        return $this->hasMany(KualitasAir::class);
+        return $this->hasMany(KualitasAir::class)->with('waktu_sample');
     }
 
     public function kuantitas(){
