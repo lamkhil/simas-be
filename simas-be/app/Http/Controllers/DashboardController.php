@@ -58,7 +58,7 @@ class DashboardController extends Controller
         }
         $ika_comparison = $ika > $ika_before ? 'Naik' : 'Turun';
         $min_ika = KualitasAir::join('waktu_samplings', 'kualitas_airs.waktu_sampling_id', '=', 'waktu_samplings.id')
-                ->where('waktu_samplings.waktu', $time[0]['waktu'])->min('ika');
+                ->where('waktu_samplings.id', $time[0]['id'])->min('ika');
                
         $ika_terendah = KualitasAir::where('ika','=',$min_ika)->where('waktu_sampling_id','=',$time[0]['id'])->first()->titik_pantau;
         $ika_terendah['ika'] = $min_ika;
