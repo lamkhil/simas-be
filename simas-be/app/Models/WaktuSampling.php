@@ -12,6 +12,6 @@ class WaktuSampling extends Model
     protected $guarded=[];
 
     function kualitas(){
-        return $this->hasMany(KualitasAir::class)->with('titik_pantau');
+        return $this->hasMany(KualitasAir::class)->orderBy('titik_pantau_id')->with('titik_pantau');
     }
 }
